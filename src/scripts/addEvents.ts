@@ -5,27 +5,57 @@ const generatedPasswordInput = document.getElementById(
 	'generated-password'
 ) as HTMLInputElement;
 const lengthInput = document.getElementById('length') as HTMLInputElement;
+const uppercaseCheckbox = document.getElementById(
+	'uppercase'
+) as HTMLInputElement;
+const lowercaseCheckbox = document.getElementById(
+	'lowercase'
+) as HTMLInputElement;
+const numbersCheckbox = document.getElementById('numbers') as HTMLInputElement;
+const symbolsCheckbox = document.getElementById(
+	'include-symbols'
+) as HTMLInputElement;
+const symbolsInput = document.getElementById('symbols') as HTMLInputElement;
 
-function addEvents() {
-	addSubmitEvent();
+addDefaultValues();
+addEvents();
+
+function addDefaultValues() {
+	if (!lengthInput || !symbolsInput) return;
+	lengthInput.value = '10';
+	symbolsInput.value = '~`!@#$%^&*()_-+={[}]|:;"' + "'<,>.?/";
 }
 
-function addSubmitEvent() {
-	if (!generatePasswordForm) return;
+function addEvents() {
+	addSymbolsCheckboxChangeEvent();
+	addGeneratePasswordSubmitEvent();
+}
 
-	generatePasswordForm.addEventListener('submit', (event) => {
-		event.preventDefault();
-		if (!generatedPasswordInput || !lengthInput) return;
-		const length = Number(lengthInput.value);
-		generatedPasswordInput.value = generatePassword(length);
+function addSymbolsCheckboxChangeEvent() {
+	symbolsCheckbox.addEventListener('change', () => {
+		symbolsInput.disabled = !symbolsCheckbox.checked;
 	});
 }
 
-function generatePassword(length: number, acceptedSymbols = '') {
-	if (!length) return '';
-	if (!acceptedSymbols)
-		acceptedSymbols =
-			'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+function addGeneratePasswordSubmitEvent() {
+	generatePasswordForm.addEventListener('submit', (event) => {
+		event.preventDefault();
+		generatedPasswordInput.value = generatePassword();
+	});
+}
+
+function generatePassword() {
+	const length = Number(lengthInput.value);
+	const includeUppercase = uppercaseCheckbox.checked;
+	const includeLowercase = lowercaseCheckbox.checked;
+	const includeNumbers = numbersCheckbox.checked;
+	const includeSymbols = symbolsCheckbox.checked;
+	const symbolsToInclude = symbolsInput.value;
+	let acceptedSymbols = '';
+	if (includeUppercase) acceptedSymbols += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	if (includeLowercase) acceptedSymbols += 'abcdefghijklmnopqrstuvwxyz';
+	if (includeNumbers) acceptedSymbols += '0123456789';
+	if (includeSymbols) acceptedSymbols += symbolsToInclude;
 	let password = '';
 	for (let c = 1; c <= length; c++)
 		password += generateRandomChar(acceptedSymbols);
@@ -37,5 +67,3 @@ function generateRandomChar(acceptedSymbols: string) {
 		crypto.getRandomValues(new Uint32Array(1))[0] % acceptedSymbols.length
 	);
 }
-
-addEvents();
