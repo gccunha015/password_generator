@@ -5,14 +5,26 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="style.css" />
-		<script src="script.js" defer></script>
+		<script type="module" src="../dist/index.js" defer></script>
 		<title>Password Generator</title>
 	</head>
 	<body>
 		<header>
 			<h1>Password Generator</h1>
 		</header>
-		<div id="app"></div>
+		<div id="app">
+			<form id="generate-password">
+				<label id="generated-password-label"
+					>Generated Password
+					<input id="generated-password" type="text" />
+				</label>
+				<input type="submit" value="Generate" />
+			</form>
+			<label id="length-label"
+				>Length
+				<input id="length" type="number" value="0" />
+			</label>
+		</div>
 		<aside id="left">
 			<p>LEFT</p>
 		</aside>
