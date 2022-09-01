@@ -14,22 +14,26 @@
 		</header>
 		<div id="app">
 			<form id="generate-password">
-				<label id="generated-password-label"
-					>Generated Password
+				<label id="password-label">
+					Password
 					<input id="generated-password" type="text" />
 				</label>
 				<input type="submit" value="Generate" />
+				<button id="copy-to-clipboard">Copy to clipboard</button>
 			</form>
 			<label id="length-label">
 				Length
-				<input id="length" type="number" value="0" />
+				<input id="length" type="range" min="1" max="100" />
+				<button id="decrease-length">-</button>
+				<span id="length-value">1</span>
+				<button id="increase-length">+</button>
 			</label>
 			<label id="uppercase-label">
-				Include uppercase letters
+				Include uppercase
 				<input type="checkbox" id="uppercase" checked />
 			</label>
 			<label id="lowercase-label">
-				Include lowercase letters
+				Include lowercase
 				<input type="checkbox" id="lowercase" checked />
 			</label>
 			<label id="numbers-label">

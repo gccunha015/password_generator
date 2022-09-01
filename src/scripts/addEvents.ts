@@ -1,65 +1,93 @@
-const generatePasswordForm = document.getElementById(
-	'generate-password'
-) as HTMLFormElement;
-const generatedPasswordInput = document.getElementById(
-	'generated-password'
-) as HTMLInputElement;
-const lengthInput = document.getElementById('length') as HTMLInputElement;
-const uppercaseCheckbox = document.getElementById(
-	'uppercase'
-) as HTMLInputElement;
-const lowercaseCheckbox = document.getElementById(
-	'lowercase'
-) as HTMLInputElement;
-const numbersCheckbox = document.getElementById('numbers') as HTMLInputElement;
-const symbolsCheckbox = document.getElementById(
-	'include-symbols'
-) as HTMLInputElement;
-const symbolsInput = document.getElementById('symbols') as HTMLInputElement;
+import {
+	lengthRange,
+	lengthValueSpan,
+	symbolsInput,
+	symbolsCheckbox,
+	generatePasswordForm,
+	copyToClipboardButton,
+	generatedPasswordInput,
+	uppercaseCheckbox,
+	lowercaseCheckbox,
+	numbersCheckbox,
+	decreaseLengthButton,
+	increaseLengthButton,
+} from './htmlElements.js';
 
-addDefaultValues();
 addEvents();
 
-function addDefaultValues() {
-	if (!lengthInput || !symbolsInput) return;
-	lengthInput.value = '10';
-	symbolsInput.value = '~`!@#$%^&*()_-+={[}]|:;"' + "'<,>.?/";
-}
-
 function addEvents() {
-	addSymbolsCheckboxChangeEvent();
-	addGeneratePasswordSubmitEvent();
+	addLenghtRangeEvents();
+	addDecreaseLengthButtonEvents();
+	addIncreaseLengthButtonEvents();
+	addSymbolsCheckboxEvents();
+	addGeneratePasswordFormEvents();
+	addCopyToClipboardButtonEvents();
 }
 
-function addSymbolsCheckboxChangeEvent() {
+function addLenghtRangeEvents() {
+	lengthRange.addEventListener('input', () => {
+		const length = lengthRange.value;
+		lengthValueSpan.textContent = length;
+		decreaseLengthButton.disabled = length == lengthRange.min;
+		increaseLengthButton.disabled = length == lengthRange.max;
+	});
+}
+
+function addDecreaseLengthButtonEvents() {
+	decreaseLengthButton.addEventListener('click', () => {
+		lengthRange.value = String(Number(lengthRange.value) - 1);
+		lengthRange.dispatchEvent(new Event('input'));
+	});
+}
+
+function addIncreaseLengthButtonEvents() {
+	increaseLengthButton.addEventListener('click', () => {
+		lengthRange.value = String(Number(lengthRange.value) + 1);
+		lengthRange.dispatchEvent(new Event('input'));
+	});
+}
+
+function addSymbolsCheckboxEvents() {
 	symbolsCheckbox.addEventListener('change', () => {
 		symbolsInput.disabled = !symbolsCheckbox.checked;
 	});
 }
 
-function addGeneratePasswordSubmitEvent() {
+function addGeneratePasswordFormEvents() {
 	generatePasswordForm.addEventListener('submit', (event) => {
 		event.preventDefault();
-		generatedPasswordInput.value = generatePassword();
+		generatePassword();
+	});
+}
+
+function addCopyToClipboardButtonEvents() {
+	copyToClipboardButton.addEventListener('click', (event) => {
+		event.preventDefault();
+		navigator.clipboard.writeText(generatedPasswordInput.value);
 	});
 }
 
 function generatePassword() {
-	const length = Number(lengthInput.value);
 	const includeUppercase = uppercaseCheckbox.checked;
 	const includeLowercase = lowercaseCheckbox.checked;
 	const includeNumbers = numbersCheckbox.checked;
 	const includeSymbols = symbolsCheckbox.checked;
-	const symbolsToInclude = symbolsInput.value;
+	if (
+		![includeUppercase, includeLowercase, includeNumbers, includeSymbols].find(
+			(value) => value
+		)
+	)
+		return alert("Can't generate new password.");
 	let acceptedSymbols = '';
 	if (includeUppercase) acceptedSymbols += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	if (includeLowercase) acceptedSymbols += 'abcdefghijklmnopqrstuvwxyz';
 	if (includeNumbers) acceptedSymbols += '0123456789';
-	if (includeSymbols) acceptedSymbols += symbolsToInclude;
+	if (includeSymbols) acceptedSymbols += symbolsInput.value;
+	const length = Number(lengthRange.value);
 	let password = '';
 	for (let c = 1; c <= length; c++)
 		password += generateRandomChar(acceptedSymbols);
-	return password;
+	generatedPasswordInput.value = password;
 }
 
 function generateRandomChar(acceptedSymbols: string) {
